@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semester Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f23;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(138, 43, 226, 0.2) 0%, transparent 50%);
+            animation: gradientShift 15s ease infinite;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            max-width: 900px;
+            width: 100%;
+            padding: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Glowing orb effect */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .student-info {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .student-info input {
+            width: 100%;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            font-size: 18px;
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .student-info input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .student-info input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .section:hover::before {
+            left: 100%;
+        }
+
+        .section:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .section-title {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '◆';
+            color: #667eea;
+            font-size: 0.8em;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .field label {
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field input {
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(5px);
+        }
+
+        .field input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            box-shadow: 
+                0 0 20px rgba(102, 126, 234, 0.3),
+                inset 0 0 20px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .field input.error {
+            border-color: #ff6b9d;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-message {
+            color: #ff6b9d;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .calculate-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .calculate-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
+            background-position: 100% 100%;
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .calculate-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .results {
+            margin-top: 40px;
+            padding: 35px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            display: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .results.show {
+            display: block;
+            animation: slideInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideInScale {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid;
+            border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .result-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+        }
+
+        .result-value {
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 18px;
+        }
+
+        .final-result {
+            margin-top: 25px;
+            padding: 25px;
+            text-align: center;
+            border-radius: 15px;
+            font-size: 1.8em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: finalPulse 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes finalPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .final-result::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .final-result.pass {
+            background: linear-gradient(135deg, #00f260, #0575e6);
+            color: white;
+            box-shadow: 
+                0 0 40px rgba(0, 242, 96, 0.5),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .final-result.fail {
+            background: linear-gradient(135deg, #ff6b9d, #c94b4b);
+            color: white;
+            box-shadow: 
+                0 0 40px rgba(255, 107, 157, 0.5),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .final-result span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2, #f093fb);
+        }
+
+        /* Footer styling */
+        .footer {
+            margin-top: 40px;
+            padding: 25px;
+            text-align: center;
+            border-top: 2px solid rgba(102, 126, 234, 0.3);
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #667eea, #764ba2, #f093fb, transparent);
+            animation: lineGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes lineGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .creator-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+        }
+
+        .creator-name {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+            animation: nameGlow 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+
+        @keyframes nameGlow {
+            0%, 100% { filter: brightness(1) contrast(1); }
+            50% { filter: brightness(1.3) contrast(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <script>
+        for(let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <h1>✨ Semester Grade Calculator ✨</h1>
+        
+        <div class="student-info">
+            <input type="text" id="studentName" placeholder="✏️ Enter Student Name" />
+        </div>
+
+        <div class="section">
+            <div class="section-title">U.E.F.1 - Fundamental Teaching Unit 1</div>
+            <div class="input-group">
+                <div class="field">
+                    <label>🌊 Ondes et vibrations Exam</label>
+                    <input type="number" id="ondes_m" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>📚 TD Ondes et vibrations</label>
+                    <input type="number" id="ondes_td" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>📐 Mathématiques 3 Exam</label>
+                    <input type="number" id="math_m" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>📝 TD Mathématiques 3</label>
+                    <input type="number" id="math_td" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">U.E.F.2 - Fundamental Teaching Unit 2</div>
+            <div class="input-group">
+                <div class="field">
+                    <label>🧪 Chimie minérale Exam</label>
+                    <input type="number" id="chimie_m" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>⚗️ TD Chimie minérale</label>
+                    <input type="number" id="chimie_td" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>⚙️ Mécanique des fluides Exam</label>
+                    <input type="number" id="meca_m" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>🔧 TD Mécanique des fluides</label>
+                    <input type="number" id="meca_td" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">U.E.M - Methodological Teaching Unit</div>
+            <div class="input-group">
+                <div class="field">
+                    <label>📊 Proba Exam</label>
+                    <input type="number" id="proba_m" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>📈 Proba TD</label>
+                    <input type="number" id="proba_td" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>💻 Info Exam</label>
+                    <input type="number" id="info_m" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>🖥️ TP Info</label>
+                    <input type="number" id="tp_info" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>🔩 TP MDF</label>
+                    <input type="number" id="tp_meca" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>✏️ Dessin</label>
+                    <input type="number" id="dessin" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+                <div class="field">
+                    <label>🔬 TP VOM</label>
+                    <input type="number" id="tp_ondes" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">U.E.D - Discovery Teaching Unit</div>
+            <div class="input-group">
+                <div class="field">
+                    <label>🏥 HSE</label>
+                    <input type="number" id="hse" min="0" max="20" step="0.5" placeholder="0-20" />
+                    <span class="error-message">Enter 0-20</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculate()">
+            <span>🚀 Calculate Results</span>
+        </button>
+
+        <div class="results" id="results">
+            <div class="result-item">
+                <span class="result-label">👤 Student:</span>
+                <span class="result-value" id="resultName"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">📘 U.E.F.1:</span>
+                <span class="result-value" id="resultUEF1"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">📗 U.E.F.2:</span>
+                <span class="result-value" id="resultUEF2"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">📙 U.E.M:</span>
+                <span class="result-value" id="resultUEM"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">📕 U.E.D:</span>
+                <span class="result-value" id="resultUED"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">⭐ Final Average:</span>
+                <span class="result-value" id="resultFinal"></span>
+            </div>
+            <div class="final-result" id="finalResult"></div>
+        </div>
+
+        <!-- Footer with creator name -->
+        <div class="footer">
+            <div class="footer-content">
+                <span class="creator-label">Created by</span>
+                <span class="creator-name">Belkacem Djebali</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function validateInput(input) {
+            const value = parseFloat(input.value);
+            const errorMsg = input.parentElement.querySelector('.error-message');
+            
+            if (input.value === '') {
+                input.classList.remove('error');
+                errorMsg.style.display = 'none';
+                return true;
+            }
+            
+            if (isNaN(value) || value < 0 || value > 20) {
+                input.classList.add('error');
+                errorMsg.style.display = 'block';
+                return false;
+            }
+            
+            input.classList.remove('error');
+            errorMsg.style.display = 'none';
+            return true;
+        }
+
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                validateInput(this);
+            });
+        });
+
+        function calculateUEF1(ondes_m, ondes_td, math_m, math_td) {
+            const ondes_avg = (ondes_m * 0.6) + (ondes_td * 0.4);
+            const math_avg = (math_m * 0.6) + (math_td * 0.4);
+            return (ondes_avg * 2 + math_avg * 3) / 5;
+        }
+
+        function calculateUEF2(chimie_m, chimie_td, meca_m, meca_td) {
+            const chimie_avg = (chimie_m * 0.6) + (chimie_td * 0.4);
+            const meca_avg = (meca_m * 0.6) + (meca_td * 0.4);
+            return (chimie_avg * 2 + meca_avg * 2) / 4;
+        }
+
+        function calculateUEM(proba_m, proba_td, info_m, tp_info, tp_meca, dessin, tp_ondes) {
+            const proba_avg = (proba_m * 0.6) + (proba_td * 0.4);
+            const info_avg = (info_m * 0.6) + (tp_info * 0.4);
+            return (proba_avg * 2 + info_avg * 2 + tp_meca + dessin + tp_ondes) / 7;
+        }
+
+        function calculateFinalAverage(uef1, uef2, uem, ued) {
+            return ((uef1 * 5) + (uef2 * 4) + (uem * 7) + ued) / 17;
+        }
+
+        function calculate() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            let allValid = true;
+
+            inputs.forEach(input => {
+                if (!validateInput(input)) {
+                    allValid = false;
+                }
+                if (input.value === '') {
+                    input.classList.add('error');
+                    input.parentElement.querySelector('.error-message').style.display = 'block';
+                    allValid = false;
+                }
+            });
+
+            if (!allValid) {
+                alert('Please fill in all fields with valid marks (0-20)');
+                return;
+            }
+
+            const studentName = document.getElementById('studentName').value || 'Student';
+
+            const uef1 = calculateUEF1(
+                parseFloat(document.getElementById('ondes_m').value),
+                parseFloat(document.getElementById('ondes_td').value),
+                parseFloat(document.getElementById('math_m').value),
+                parseFloat(document.getElementById('math_td').value)
+            );
+
+            const uef2 = calculateUEF2(
+                parseFloat(document.getElementById('chimie_m').value),
+                parseFloat(document.getElementById('chimie_td').value),
+                parseFloat(document.getElementById('meca_m').value),
+                parseFloat(document.getElementById('meca_td').value)
+            );
+
+            const uem = calculateUEM(
+                parseFloat(document.getElementById('proba_m').value),
+                parseFloat(document.getElementById('proba_td').value),
+                parseFloat(document.getElementById('info_m').value),
+                parseFloat(document.getElementById('tp_info').value),
+                parseFloat(document.getElementById('tp_meca').value),
+                parseFloat(document.getElementById('dessin').value),
+                parseFloat(document.getElementById('tp_ondes').value)
+            );
+
+            const ued = parseFloat(document.getElementById('hse').value);
+            const finalAvg = calculateFinalAverage(uef1, uef2, uem, ued);
+
+            document.getElementById('resultName').textContent = studentName;
+            document.getElementById('resultUEF1').textContent = uef1.toFixed(2) + '/20';
+            document.getElementById('resultUEF2').textContent = uef2.toFixed(2) + '/20';
+            document.getElementById('resultUEM').textContent = uem.toFixed(2) + '/20';
+            document.getElementById('resultUED').textContent = ued.toFixed(2) + '/20';
+            document.getElementById('resultFinal').textContent = finalAvg.toFixed(2) + '/20';
+
+            const finalResultDiv = document.getElementById('finalResult');
+            if (finalAvg >= 10) {
+                finalResultDiv.innerHTML = '<span>✓ PASS</span>';
+                finalResultDiv.className = 'final-result pass';
+            } else {
+                finalResultDiv.innerHTML = '<span>✗ FAIL</span>';
+                finalResultDiv.className = 'final-result fail';
+            }
+
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
