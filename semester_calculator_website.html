@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Semester Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .group {
+      margin-bottom: 20px;
+    }
+    .group h3 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eef2ff;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Semester Calculator</h1>
+
+    <label>Student Name</label>
+    <input id="name" type="text" />
+
+    <div class="group">
+      <h3>U.E.F.1</h3>
+      <label>Ondes Exam</label><input id="ondes_m" type="number" min="0" max="20" />
+      <label>Ondes TD</label><input id="ondes_td" type="number" min="0" max="20" />
+      <label>Math Exam</label><input id="math_m" type="number" min="0" max="20" />
+      <label>Math TD</label><input id="math_td" type="number" min="0" max="20" />
+    </div>
+
+    <div class="group">
+      <h3>U.E.F.2</h3>
+      <label>Chimie Exam</label><input id="chimie_m" type="number" min="0" max="20" />
+      <label>Chimie TD</label><input id="chimie_td" type="number" min="0" max="20" />
+      <label>Mécanique Exam</label><input id="meca_m" type="number" min="0" max="20" />
+      <label>Mécanique TD</label><input id="meca_td" type="number" min="0" max="20" />
+    </div>
+
+    <div class="group">
+      <h3>U.E.M</h3>
+      <label>Proba Exam</label><input id="proba_m" type="number" min="0" max="20" />
+      <label>Proba TD</label><input id="proba_td" type="number" min="0" max="20" />
+      <label>Info Exam</label><input id="info_m" type="number" min="0" max="20" />
+      <label>TP Info</label><input id="tp_info" type="number" min="0" max="20" />
+      <label>TP Mécanique</label><input id="tp_meca" type="number" min="0" max="20" />
+      <label>Dessin</label><input id="dessin" type="number" min="0" max="20" />
+      <label>TP Ondes</label><input id="tp_ondes" type="number" min="0" max="20" />
+    </div>
+
+    <div class="group">
+      <h3>U.E.D</h3>
+      <label>HSE</label><input id="hse" type="number" min="0" max="20" />
+    </div>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function val(id) {
+      return parseFloat(document.getElementById(id).value) || 0;
+    }
+
+    function calculate() {
+      const uef1 = (((val('ondes_m')*0.6 + val('ondes_td')*0.4)*2) + ((val('math_m')*0.6 + val('math_td')*0.4)*3)) / 5;
+      const uef2 = (((val('chimie_m')*0.6 + val('chimie_td')*0.4)*2) + ((val('meca_m')*0.6 + val('meca_td')*0.4)*2)) / 4;
+      const uem = (((val('proba_m')*0.6 + val('proba_td')*0.4)*2) + ((val('info_m')*0.6 + val('tp_info')*0.4)*2) + val('tp_meca') + val('dessin') + val('tp_ondes')) / 7;
+      const ued = val('hse');
+      const finalAvg = ((uef1*5) + (uef2*4) + (uem*7) + ued) / 17;
+
+      document.getElementById('result').innerHTML = `
+        <strong>Student:</strong> ${document.getElementById('name').value}<br />
+        U.E.F.1: ${uef1.toFixed(2)} / 20<br />
+        U.E.F.2: ${uef2.toFixed(2)} / 20<br />
+        U.E.M: ${uem.toFixed(2)} / 20<br />
+        U.E.D: ${ued.toFixed(2)} / 20<br /><br />
+        <strong>Average:</strong> ${finalAvg.toFixed(2)} / 20<br />
+        <strong>Result:</strong> ${finalAvg >= 10 ? 'PASS' : 'FAIL'}
+      `;
+    }
+  </script>
+</body>
+</html>
